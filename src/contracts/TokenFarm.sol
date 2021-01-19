@@ -1,7 +1,7 @@
 pragma solidity >=0.4.21 <0.6.0;
 
-import "./DaiToken";
-import "./DappToken";
+import "./DiaToken.sol";
+import "./DappToken.sol";
 
 contract TokenFarm {
     string public name = "Token Farm";
