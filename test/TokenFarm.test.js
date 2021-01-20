@@ -10,7 +10,7 @@ function weiToToken(wei) {
   return web3.utils.fromWei(wei, "ether");
 }
 
-contract("TokenFarm", function ([owner, invester]) {
+contract("TokenFarm", function ([owner, investor]) {
   let diaToken;
   let dappToken;
   let tokenFarm;
@@ -24,8 +24,8 @@ contract("TokenFarm", function ([owner, invester]) {
     // transfer
     await dappToken.transfer(tokenFarm.address, tokenToWei("1000000"));
 
-    // transfer 100 Dia to invester
-    await diaToken.transfer(invester, tokenToWei("100"), { from: owner });
+    // transfer 100 Dia to investor
+    await diaToken.transfer(investor, tokenToWei("100"), { from: owner });
   });
 
   describe("Dia depolyment", async () => {
@@ -52,9 +52,29 @@ contract("TokenFarm", function ([owner, invester]) {
       assert.equal(weiToToken(dappBalance.toString()), "1000000");
     });
 
-    it("invester has dia token", async () => {
-      const diaBalance = await diaToken.balanceOf(invester);
+    it("investor has dia token", async () => {
+      const diaBalance = await diaToken.balanceOf(investor);
       assert.equal(weiToToken(diaBalance.toString()), "100");
-    });
+		});
+		
+		it('staked', async () => {
+			let result;
+
+			// Check investor balance before staking
+			result = await diaToken.balanceOf(investor);
+			assert.equal(result.toString(), tokenToWei("100"), 'investor has 100 dia');
+
+			// Stake Mock DAI Tokens
+			await diaToken.approve(tokenFarm.address, tokenToWei("100"), { from: investor });
+			await tokenFarm.stakeToken(tokenToWei("100"), { from: investor });
+
+			// Check staking result
+			result = await diaToken.balanceOf(investor)
+			assert.equal(result.toString(), tokenToWei('0'), 'investor Mock DAI wallet balance correct after staking')
+
+			result = await diaToken.balanceOf(tokenFarm.address)
+			assert.equal(result.toString(), tokenToWei('100'), 'Token Farm Mock DAI balance correct after staking')
+		});
+
   });
 });
