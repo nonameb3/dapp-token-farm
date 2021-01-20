@@ -3,7 +3,8 @@ pragma solidity ^0.5.0;
 contract DiaToken {
     string public name = "Mock DAI Token";
     string public symbol = "mDAI";
-    uint256 public totalSupply = 1000000000000000000000000; // 1 million tokens
+    address public owner;
+    uint256 public totalSupply = 1000000000000000000000000; // 1 million tokens(Wei)
     uint8 public decimals = 18;
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
@@ -19,6 +20,7 @@ contract DiaToken {
 
     constructor() public {
         balanceOf[msg.sender] = totalSupply;
+        owner = msg.sender;
     }
 
     function transfer(address _to, uint256 _value)
