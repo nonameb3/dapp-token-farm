@@ -23,7 +23,7 @@ contract TokenFarm {
     }
 
     // stake token
-    function stakeToken(uint256 _token) public {
+    function stakeTokens(uint256 _token) public {
         // transfer dia to this contract
         emit Transfer(msg.sender, address(this), _token);
         diaToken.transferFrom(msg.sender, address(this), _token);

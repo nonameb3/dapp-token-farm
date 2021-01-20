@@ -10,7 +10,7 @@ function weiToToken(wei) {
   return web3.utils.fromWei(wei, "ether");
 }
 
-contract("TokenFarm", function ([owner, investor]) {
+contract("TokenFarm", async ([owner, investor]) => {
   let diaToken;
   let dappToken;
   let tokenFarm;
@@ -19,7 +19,7 @@ contract("TokenFarm", function ([owner, investor]) {
     // deploy
     diaToken = await DiaToken.new();
     dappToken = await DappToken.new();
-    tokenFarm = await TokenFarm.new(DiaToken.address, DappToken.address);
+    tokenFarm = await TokenFarm.new(diaToken.address, dappToken.address);
 
     // transfer
     await dappToken.transfer(tokenFarm.address, tokenToWei("1000000"));
@@ -66,7 +66,7 @@ contract("TokenFarm", function ([owner, investor]) {
 
 			// Stake Mock DAI Tokens
 			await diaToken.approve(tokenFarm.address, tokenToWei("100"), { from: investor });
-			await tokenFarm.stakeToken(tokenToWei("100"), { from: investor });
+			await tokenFarm.stakeTokens(tokenToWei("100"), { from: investor });
 
 			// Check staking result
 			result = await diaToken.balanceOf(investor)
@@ -74,7 +74,6 @@ contract("TokenFarm", function ([owner, investor]) {
 
 			result = await diaToken.balanceOf(tokenFarm.address)
 			assert.equal(result.toString(), tokenToWei('100'), 'Token Farm Mock DAI balance correct after staking')
-		});
-
+    });
   });
 });
