@@ -5,4 +5,5 @@ This project used Ethereum blockchain.
 - npm install --g truffle@5.1.39
 - fruffle compile
 - truffle margrate --reset
-- truffle test
+- truffle test // test
+- truffle excc scripts/issue-token.js // run issue-token

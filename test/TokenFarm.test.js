@@ -1,3 +1,8 @@
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+chai.use(chaiAsPromised);
+chai.should();
+
 const DiaToken = artifacts.require("DiaToken");
 const DappToken = artifacts.require("DappToken");
 const TokenFarm = artifacts.require("TokenFarm");
@@ -49,12 +54,12 @@ contract("TokenFarm", async ([owner, investor]) => {
   describe("Contract", async () => {
     it("contact has token", async () => {
       const dappBalance = await dappToken.balanceOf(tokenFarm.address);
-      assert.equal(weiToToken(dappBalance.toString()), "1000000");
+      assert.equal(dappBalance.toString(), tokenToWei("1000000"));
     });
 
     it("investor has dia token", async () => {
       const diaBalance = await diaToken.balanceOf(investor);
-      assert.equal(weiToToken(diaBalance.toString()), "100");
+      assert.equal(diaBalance.toString(), tokenToWei("100"));
 		});
 		
 		it('staked', async () => {
@@ -69,11 +74,36 @@ contract("TokenFarm", async ([owner, investor]) => {
 			await tokenFarm.stakeTokens(tokenToWei("100"), { from: investor });
 
 			// Check staking result
-			result = await diaToken.balanceOf(investor)
-			assert.equal(result.toString(), tokenToWei('0'), 'investor Mock DAI wallet balance correct after staking')
+			result = await diaToken.balanceOf(investor);
+			assert.equal(result.toString(), tokenToWei('0'), 'investor DIA wallet balance correct after staking');
 
-			result = await diaToken.balanceOf(tokenFarm.address)
-			assert.equal(result.toString(), tokenToWei('100'), 'Token Farm Mock DAI balance correct after staking')
+			result = await diaToken.balanceOf(tokenFarm.address);
+      assert.equal(result.toString(), tokenToWei('100'), 'Token Farm DIA balance correct after staking');
+      
+      result = await tokenFarm.stakingBalance(investor);
+      assert.equal(result.toString(), tokenToWei('100'), 'Check Token Farm has staking balance');
+      
+      result = await tokenFarm.isStaking(investor)
+      assert.equal(result, true, 'Check Token Farm has staking')
+      
+      // try issueToken token
+      result = await dappToken.balanceOf(investor);
+      assert.equal(result.toString(), '0', 'Check dappToken balance is zero');
+
+      await tokenFarm.issueToken({from:owner});
+      await tokenFarm.issueToken({from:investor}).should.be.rejected;
+
+      result = await dappToken.balanceOf(investor);
+      assert.equal(result.toString(), tokenToWei('100'), 'Check dappToken balance has value back');
+
+      // check unstak token
+      await tokenFarm.unStakeTokens({from:investor});
+
+			result = await diaToken.balanceOf(investor);
+			assert.equal(result.toString(), tokenToWei('100'), 'investor DIA wallet balance have value after unstak');
+
+      result = await tokenFarm.isStaking(investor)
+      assert.equal(result, false, 'Check Token Farm has unStaking')
     });
   });
 });

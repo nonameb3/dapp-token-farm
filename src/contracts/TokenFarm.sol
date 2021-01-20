@@ -10,11 +10,9 @@ contract TokenFarm {
     DappToken public dappToken;
 
     address[] public stakers;
-    mapping(address => uint256) public stakingBalance;
+    mapping(address => uint) public stakingBalance;
     mapping(address => bool) public isStaking;
     mapping(address => bool) public hasStaked;
-
-    event Transfer(address indexed _from, address indexed _to, uint256 _value);
 
     constructor(DiaToken _diaToken, DappToken _dappToken) public {
         diaToken = _diaToken;
@@ -23,9 +21,10 @@ contract TokenFarm {
     }
 
     // stake token
-    function stakeTokens(uint256 _token) public {
+    function stakeTokens(uint _token) public {
+        require(_token > 0, '_token must more then zero.');
+
         // transfer dia to this contract
-        emit Transfer(msg.sender, address(this), _token);
         diaToken.transferFrom(msg.sender, address(this), _token);
 
         // update stake
@@ -40,4 +39,32 @@ contract TokenFarm {
         isStaking[msg.sender] = true;
         hasStaked[msg.sender] = true;
     }
+
+    // unstake token
+    function unStakeTokens() public {
+        uint balance =  stakingBalance[msg.sender];
+
+        require(balance > 0, 'account is empty balance');
+
+        diaToken.transfer(msg.sender, balance);
+
+        stakingBalance[msg.sender] = 0;
+        isStaking[msg.sender] = false;
+    }
+
+
+    // issue Token
+    function issueToken() public {
+        require(owner == msg.sender, 'must be owner');
+
+        for(uint i=0; i<stakers.length; i++ ) {
+            address recipient = stakers[i];
+            uint balance = stakingBalance[recipient];
+
+            if(balance > 0) {
+                dappToken.transfer(recipient, balance);
+            }
+        }
+    }
+
 }
