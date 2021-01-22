@@ -3,12 +3,12 @@ import './Header.css'
 
 import Logo from '../image/logo.png'
 
-function App() {
+function App({ account }) {
   return (
     <header className="header">
       <img src={Logo} width="24px" alt="logo" />
       <div className="header-content">
-        <span>0xasdadsads</span>
+        <span>{account}</span>
       </div>
     </header>
   )

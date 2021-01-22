@@ -3,7 +3,7 @@
 } */
 
 .text-gray {
-  color: rgb(86, 90, 105);
+  color: rgb(86, 90, 105) !important;
 }
 
 .box {

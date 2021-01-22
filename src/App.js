@@ -51,7 +51,7 @@ function App() {
         alert("can't find diatoken contract network!")
       }
 
-      const dappTokenData = DiaToken.networks[networkId];
+      const dappTokenData = DappToken.networks[networkId];
       if(dappTokenData) {
         const dappToken = new web3.eth.Contract(DappToken.abi, dappTokenData.address);
         const dappTokenBalance = await dappToken.methods.balanceOf(accounts[0]).call();
@@ -79,8 +79,8 @@ function App() {
 
   return (
     <div className="app">
-      <Header />
-      <Content />
+      <Header account={state.account}/>
+      <Content token={state}/>
     </div>
   );
 }

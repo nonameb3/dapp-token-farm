@@ -23,6 +23,10 @@ html, body {
   display: flex;
 }
 
+.flex-1 {
+  flex: 1 1;
+}
+
 .wrap {
   flex-wrap: wrap;
 }
@@ -33,6 +37,10 @@ html, body {
 
 .justify-center {
   justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
 }
 
 .items-center {
