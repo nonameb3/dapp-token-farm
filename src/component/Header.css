@@ -1,0 +1,16 @@
+.header {
+  height: 64px;
+  padding: 0 50px;
+  color: #888388;
+  line-height: 64px;
+  background: #F7F4F8;
+  border-bottom: 1px solid #E4E3E6;
+  display: flex;
+  justify-content: space-between;
+}
+
+.header img {
+  padding: 0.5rem;
+  object-fit: cover;
+  width: 45px;
+}

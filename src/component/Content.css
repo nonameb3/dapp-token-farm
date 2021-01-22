@@ -1,0 +1,88 @@
+/* .content {
+  background: #F7F4F8;
+} */
+
+.text-gray {
+  color: rgb(86, 90, 105);
+}
+
+.box {
+  position: relative;
+  max-width: 420px;
+  width: 100%;
+  background: rgb(255, 255, 255);
+  box-shadow: rgba(0, 0, 0, 0.01) 0px 0px 1px, rgba(0, 0, 0, 0.04) 0px 4px 8px, rgba(0, 0, 0, 0.04) 0px 16px 24px, rgba(0, 0, 0, 0.01) 0px 24px 32px;
+  border-radius: 30px;
+}
+
+.box-header {
+  padding: 12px 1rem 0px 1.5rem;
+  margin-bottom: -4px;
+  width: 100%;
+  max-width: 420px;
+  color: rgb(86, 90, 105);
+}
+
+.box-item {
+  border-radius: 20px;
+  border: 1px solid rgb(247, 248, 250);
+  background-color: rgb(255, 255, 255);
+}
+
+.box-item .head {
+  display: flex;
+  flex-flow: row nowrap;
+  -webkit-box-align: center;
+  align-items: center;
+  color: rgb(0, 0, 0);
+  line-height: 1rem;
+  padding: 0.75rem 1rem 0px;
+}
+
+.box-item .item {
+  display: flex;
+  flex-flow: row nowrap;
+  -webkit-box-align: center;
+  align-items: center;
+  padding: 0.75rem 0.75rem 0.75rem 1rem;
+}
+
+.box-item .item input {
+  color: rgb(0, 0, 0);
+  width: 0px;
+  position: relative;
+  font-weight: 500;
+  outline: none;
+  border: none;
+  flex: 1 1 auto;
+  background-color: rgb(255, 255, 255);
+  font-size: 24px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0px;
+  appearance: textfield;
+}
+
+.box-btn {
+  padding: 18px;
+  width: 100%;
+  text-align: center;
+  border-radius: 20px;
+  outline: none;
+  border: 1px solid transparent;
+  text-decoration: none;
+  display: flex;
+  -webkit-box-pack: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  -webkit-box-align: center;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  background-color: rgb(253, 234, 241);
+  color: rgb(255, 0, 122);
+  font-size: 20px;
+  font-weight: 500;
+}

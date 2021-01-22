@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import Web3 from 'web3';
-import logo from "./logo.svg";
+// import logo from "./logo.svg";
 import "./App.css";
 
 import DiaToken from './abis/DiaToken.json';
@@ -8,6 +8,8 @@ import DappToken from './abis/DappToken.json';
 import TokenFarm from './abis/TokenFarm.json';
 
 import useMyState from './hooks/useMyState';
+import Header from './component/Header';
+import Content from './component/Content';
 
 const initalState = {
   account: '0x',
@@ -16,7 +18,7 @@ const initalState = {
   tokenFarm: {},
   diaTokenBalance: 0,
   dappTokenBalance: 0,
-  farmTokenBalance: 0,
+  tokenFarmBalance: 0,
   isLoading: false
 }
 
@@ -58,28 +60,27 @@ function App() {
       } else {
         alert("can't find dapptoken contract network!")
       }
+
+      const tokenFarmData = TokenFarm.networks[networkId];
+      if(tokenFarmData) {
+        const tokenFarm = new web3.eth.Contract(TokenFarm.abi, tokenFarmData.address);
+        const tokenFarmBalance = await tokenFarm.methods.stakingBalance(accounts[0]).call();
+
+        setState({ tokenFarm, tokenFarmBalance })
+      } else {
+        alert("can't find dapptoken contract network!")
+      }
     }
 
     fetchWeb3();
   }, []);
 
   console.log('state', state)
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+      <Header />
+      <Content />
     </div>
   );
 }
