@@ -6,6 +6,19 @@
     <img src="/image/app.png" width="800">
 </p>
 
+## :wine_glass: Features
+- Simple farm token Decentralized application
+  - Stake token
+  - Unstake token
+  - Receive free token
+
+## :jack_o_lantern: Technology
+- Solidity
+- Truffle
+- Ganache
+- React.js
+- web3.js
+
 ## :grey_question: How to install & start Dapp
 
 - Install Ganache to your machine
