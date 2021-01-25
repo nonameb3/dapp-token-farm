@@ -6,4 +6,4 @@ This project used Ethereum blockchain.
 - fruffle compile
 - truffle margrate --reset
 - truffle test // test
-- truffle excc scripts/issue-token.js // run issue-token
+- truffle exec scripts/issue-token.js // run issue-token

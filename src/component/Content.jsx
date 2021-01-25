@@ -1,16 +1,40 @@
-import React from 'react'
-import './Content.css'
+import React, { useState } from 'react';
+import Web3 from 'web3';
+import './Content.css';
 
 import DiaTokenLogo from '../image/DIA-icon-colour.webp'
 
 function fromWei(token) {
-  if(!window.web3?.utils){
+  const web3 = new Web3(window.ethereum);
+  
+  if(!web3?.utils){
     return 0;
   }
-  return window.web3.utils.fromWei(token.toString());
+  return web3.utils.fromWei(token.toString());
 }
 
-function App({ token=0 }) {
+function toWei(token) {
+  const web3 = new Web3(window.ethereum);
+  
+  if(!web3?.utils){
+    return 0;
+  }
+  return web3.utils.toWei(token.toString());
+}
+
+function App({ token=0, onStakeToken, onUnStakeToken}) {
+  const [amount, setAmount] = useState(0);
+
+  function onSubmit(e) {
+    e.preventDefault();
+    onStakeToken(toWei(amount));
+  }
+
+  function onUnStake(e) {
+    e.preventDefault();
+    onUnStakeToken();
+  }
+  
   return (
     <div className="content">
       <div className="flex justify-center text-center">
@@ -32,7 +56,7 @@ function App({ token=0 }) {
         </div>
       </div>
       <div className="flex justify-center items-center">
-        <div className="box">
+        <form className="box" onSubmit={onSubmit}>
           <div className="box-header flex">
             <div className="flex-1"><b>Stake</b></div>
           </div>
@@ -45,9 +69,12 @@ function App({ token=0 }) {
               <div className="item">
                 <input
                   className="item-input"
-                  type="text"
-                  pattern="^[0-9]*[.,]?[0-9]*$"
+                  type="number"
+                  step="1"
                   placeholder="0.0"
+                  max={fromWei(token.diaTokenBalance)}
+                  value={amount}
+                  onChange={({target}) => setAmount(target.value)}
                 />
                 <div className="flex items-center wrap">
                   <img src={DiaTokenLogo} width="35px" alt="WebP rules." />
@@ -57,9 +84,12 @@ function App({ token=0 }) {
             </div>
           </div>
           <div className="p-1">
-            <button className="box-btn">STAKE!</button>
+            <button type="submit" className="box-btn">STAKE!</button>
+            <div className="mt-1 flex justify-center">
+              <button type="button" className="box-btn-transparent" onClick={onUnStake}>UN-STAKE</button>
+            </div>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   )

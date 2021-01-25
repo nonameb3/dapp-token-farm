@@ -27,16 +27,16 @@ function App() {
   
   useEffect(() => {
     const fetchWeb3 = async () => {
+      let web3;
       if(window.ethereum) {
-        window.web3 = new Web3(window.ethereum);
+        web3 = new Web3(window.ethereum);
         await window.ethereum.enable();
       } else if(window.web3) {
-        window.web3 = new Web3(window.web3.currentProvider);
+        web3 = new Web3(window.web3.currentProvider);
       } else {
         return alert("can't detected your MetaMask!");
       }
 
-      const web3 = window.web3;
       const accounts = await web3.eth.requestAccounts();
       setState({account: accounts[0]})
 
@@ -75,12 +75,30 @@ function App() {
     fetchWeb3();
   }, []);
 
-  console.log('state', state)
+  function onStakeToken(amount) {
+    const { diaToken, tokenFarm, account } = state;
+    setState({ isLoading: true });
+    diaToken.methods.approve(tokenFarm._address, amount).send({from: account}).on("transactionHash", hash => {
+      tokenFarm.methods.stakeTokens(amount).send({from: account}).on("transactionHash", hash => {
+        setState({ isLoading: false });
+        console.log('success')
+      });
+    });
+  }
+
+  function onUnStakeToken() {
+    const { tokenFarm, account } = state;
+    setState({ isLoading: true });
+    tokenFarm.methods.unStakeTokens().send({from: account}).on("transactionHash", hash => {
+      setState({ isLoading: false });
+      console.log('success')
+    });
+  }
 
   return (
     <div className="app">
       <Header account={state.account}/>
-      <Content token={state}/>
+      <Content token={state} onStakeToken={onStakeToken} onUnStakeToken={onUnStakeToken}/>
     </div>
   );
 }
