@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import Web3 from 'web3';
-// import logo from "./logo.svg";
 import "./App.css";
 
 import DiaToken from './abis/DiaToken.json';
 import DappToken from './abis/DappToken.json';
 import TokenFarm from './abis/TokenFarm.json';
 
-import {fromWei, toWei} from './helper/web3'
+import { web3, fromWei, toWei, getWeb3, fetchToken } from './helper/web3'
 import useMyState from './hooks/useMyState';
 import Header from './component/Header';
 
 import DiaTokenLogo from './image/DIA-icon-colour.webp'
 
 const initalState = {
-  account: '0x',
+  account: '',
   diaToken: {},
   dappToken: {},
   tokenFarm: {},
@@ -27,83 +26,63 @@ const initalState = {
 function App() {
   const [state, setState] = useMyState(initalState);
   const [amount, setAmount] = useState(0);
-  
+
   useEffect(() => {
     const fetchWeb3 = async () => {
-      let web3;
-      if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        await window.ethereum.enable();
-      } else if (window.web3) {
-        web3 = new Web3(window.web3.currentProvider);
-      } else {
-        return alert("can't detected your MetaMask!");
-      }
-
-      const accounts = await web3.eth.requestAccounts();
-      setState({ account: accounts[0] })
-
-      const networkId = await web3.eth.net.getId();
-      const diaTokenData = DiaToken.networks[networkId];
-      if (diaTokenData) {
-        const diaToken = new web3.eth.Contract(DiaToken.abi, diaTokenData.address);
-        const diaTokenBalance = await diaToken.methods.balanceOf(accounts[0]).call();
-
-        setState({ diaToken, diaTokenBalance });
-      } else {
-        alert("can't find diatoken contract network!")
-      }
-
-      const dappTokenData = DappToken.networks[networkId];
-      if (dappTokenData) {
-        const dappToken = new web3.eth.Contract(DappToken.abi, dappTokenData.address);
-        const dappTokenBalance = await dappToken.methods.balanceOf(accounts[0]).call();
-
-        setState({ dappToken, dappTokenBalance })
-      } else {
-        alert("can't find dapptoken contract network!")
-      }
-
-      const tokenFarmData = TokenFarm.networks[networkId];
-      if (tokenFarmData) {
-        const tokenFarm = new web3.eth.Contract(TokenFarm.abi, tokenFarmData.address);
-        const tokenFarmBalance = await tokenFarm.methods.stakingBalance(accounts[0]).call();
-
-        setState({ tokenFarm, tokenFarmBalance })
-      } else {
-        alert("can't find dapptoken contract network!")
-      }
+      const newWeb3 = new Web3(window.ethereum);
+      const accounts = await newWeb3.eth.getAccounts();
+      setState({ account: accounts[0] });
+      web3 = newWeb3;
     }
 
     fetchWeb3();
   }, []);
 
-  function onSubmit(e) {
+  useEffect(() => {
+    if (state.account) {
+      fetchToken(state.account, setState).then(data => {
+        setState({ ...data, isLoading: false});
+      });
+    }
+  }, [state.account]);
+
+  async function onSubmit(e) {
     e.preventDefault();
     const stakeToken = toWei(amount);
     const { diaToken, tokenFarm, account } = state;
     setState({ isLoading: true });
     diaToken.methods.approve(tokenFarm._address, stakeToken).send({ from: account }).on("transactionHash", hash => {
-      tokenFarm.methods.stakeTokens(stakeToken).send({ from: account }).on("transactionHash", hash => {
-        setState({ isLoading: false });
-        console.log('success')
+      tokenFarm.methods.stakeTokens(stakeToken).send({ from: account }).on("transactionHash", async hash => {
+        const data = await fetchToken(state.account, setState);
+        setState({ ...data, isLoading: false});
+        setAmount(0);
+        console.log('stake success', data)
       });
     });
   }
 
-  function onUnStake(e) {
+  async function onUnStake(e) {
     e.preventDefault();
     const { tokenFarm, account } = state;
     setState({ isLoading: true });
-    tokenFarm.methods.unStakeTokens().send({ from: account }).on("transactionHash", hash => {
-      setState({ isLoading: false });
-      console.log('success')
+    tokenFarm.methods.unStakeTokens().send({ from: account }).on("transactionHash", async  hash => {
+      const data = await fetchToken(state.account, setState);
+      setState({ ...data, isLoading: false});
+      setAmount(0)
+      console.log('unStake success', data)
     });
+  }
+
+  async function onConnect() {
+    const newWeb3 = await getWeb3();
+    const accounts = await newWeb3.eth.getAccounts();
+    setState({ account: accounts[0] });
+    web3 = newWeb3;
   }
 
   return (
     <div className="app">
-      <Header account={state.account} />
+      <Header account={state.account ? state.account : '0x'} />
       <div className="content">
         <div className="flex justify-center text-center">
           <div className="p-1">
@@ -140,6 +119,7 @@ function App() {
                     type="number"
                     step="1"
                     placeholder="0.0"
+                    min="1"
                     max={fromWei(state.diaTokenBalance)}
                     value={amount}
                     onChange={({ target }) => setAmount(target.value)}
@@ -152,10 +132,19 @@ function App() {
               </div>
             </div>
             <div className="p-1">
-              <button type="submit" className="box-btn">STAKE!</button>
-              <div className="mt-1 flex justify-center">
-                <button type="button" className="box-btn-transparent" onClick={onUnStake}>UN-STAKE</button>
-              </div>
+              {state.account ? (
+                <>
+                  <button type="submit" className="box-btn">STAKE!</button>
+                  <div className="mt-1 flex justify-center">
+                    <button type="button" className="box-btn-transparent" onClick={onUnStake}>UN-STAKE</button>
+                  </div>
+                </>
+              ) : (
+                  <div className="flex justify-center">
+                    <button type="button" className="box-btn" onClick={onConnect}>CONNECT TO MATEMASK!</button>
+                  </div>
+                )}
+
             </div>
           </form>
         </div>
