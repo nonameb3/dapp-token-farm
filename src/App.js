@@ -51,12 +51,12 @@ function App() {
     const stakeToken = toWei(amount);
     const { diaToken, tokenFarm, account } = state;
     setState({ isLoading: true });
-    diaToken.methods.approve(tokenFarm._address, stakeToken).send({ from: account }).on("transactionHash", hash => {
-      tokenFarm.methods.stakeTokens(stakeToken).send({ from: account }).on("transactionHash", async hash => {
+    diaToken.methods.approve(tokenFarm._address, stakeToken).send({ from: account }).on("receipt", receipt => {
+      tokenFarm.methods.stakeTokens(stakeToken).send({ from: account }).on("receipt", async receipt => {
         const data = await fetchToken(state.account, setState);
         setState({ ...data, isLoading: false});
         setAmount(0);
-        console.log('stake success', data)
+        console.log('stake success', receipt)
       });
     });
   }
@@ -65,11 +65,11 @@ function App() {
     e.preventDefault();
     const { tokenFarm, account } = state;
     setState({ isLoading: true });
-    tokenFarm.methods.unStakeTokens().send({ from: account }).on("transactionHash", async  hash => {
+    tokenFarm.methods.unStakeTokens().send({ from: account }).on("receipt", async  receipt => {
       const data = await fetchToken(state.account, setState);
       setState({ ...data, isLoading: false});
       setAmount(0)
-      console.log('unStake success', data)
+      console.log('unStake success', receipt)
     });
   }
 
